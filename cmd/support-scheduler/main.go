@@ -58,12 +58,12 @@ func main() {
 	var loggingClient = logger.NewClient(configuration.ApplicationName, configuration.EnableRemoteLogging, logTarget)
 
 	loggingClient.Info(consulMsg)
-	loggingClient.Info(fmt.Sprintf("starting %s %s ", scheduler.SupportScheduleServiceName, edgex.Version))
+	loggingClient.Info(fmt.Sprintf("starting %s %s ", scheduler.SupportSchedulerServiceName, edgex.Version))
 
 	var schedulerClient = sc.SchedulerClient{
 		SchedulerServiceHost: configuration.ServiceHost,
 		SchedulerServicePort: 48081,
-		OwningService: scheduler.SupportScheduleServiceName,
+		OwningService: scheduler.SupportSchedulerServiceName,
 	}
 
 	scheduler.Init(*configuration, loggingClient, schedulerClient)
@@ -84,7 +84,7 @@ func main() {
 	scheduler.StopTicker()
 }
 func logBeforeTermination(err error) {
-	loggingClient = logger.NewClient(scheduler.SupportScheduleServiceName, false, "")
+	loggingClient = logger.NewClient(scheduler.SupportSchedulerServiceName, false, "")
 	loggingClient.Error(err.Error())
 }
 
