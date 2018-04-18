@@ -360,7 +360,11 @@ func triggerSchedule() {
 				loggingClient.Debug("schedule with id : " + scheduleId + " next schedule time is : " + scheduleContext.NextTime.String())
 				if scheduleContext.NextTime.Unix() <= nowEpoch {
 					loggingClient.Info("executing schedule, detail : {" + scheduleContext.GetInfo() + "} , at : " + scheduleContext.NextTime.String())
-					execute(scheduleContext)
+
+					ch := make(chan int)
+
+					//execute it in a individual go routine
+					go execute(scheduleContext, ch)
 
 					scheduleContext.UpdateNextTime()
 					scheduleContext.UpdateIterations()
@@ -371,6 +375,9 @@ func triggerSchedule() {
 						loggingClient.Info("requeue schedule, detail : " + scheduleContext.GetInfo())
 						scheduleQueue.Add(scheduleContext)
 					}
+
+					//waiting the go routine finish
+					<-ch
 				} else {
 					scheduleQueue.Add(scheduleContext)
 				}
@@ -379,7 +386,7 @@ func triggerSchedule() {
 	}
 }
 
-func execute(context *ScheduleContext) {
+func execute(context *ScheduleContext, ch chan int) {
 	scheduleEventsMap := context.ScheduleEventsMap
 
 	defer func() {
@@ -415,6 +422,8 @@ func execute(context *ScheduleContext) {
 		loggingClient.Debug(fmt.Sprintf("execution returns status code : %d", statusCode))
 		loggingClient.Debug("execution returns response content : " + responseStr)
 	}
+
+	ch <- 1
 }
 
 func getUrlStr(addressable models.Addressable) string {
