@@ -348,6 +348,8 @@ func triggerSchedule() {
 
 	loggingClient.Debug(fmt.Sprintf("%d item in schedule queue.", scheduleQueue.Length()))
 
+	var wg sync.WaitGroup
+
 	for i := 0; i < scheduleQueue.Length(); i++ {
 		if scheduleQueue.Peek().(*ScheduleContext) != nil {
 			scheduleContext := scheduleQueue.Remove().(*ScheduleContext)
@@ -360,27 +362,25 @@ func triggerSchedule() {
 				loggingClient.Debug("schedule with id : " + scheduleId + " next schedule time is : " + scheduleContext.NextTime.String())
 				if scheduleContext.NextTime.Unix() <= nowEpoch {
 					loggingClient.Info("executing schedule, detail : {" + scheduleContext.GetInfo() + "} , at : " + scheduleContext.NextTime.String())
-					execute(scheduleContext)
 
-					scheduleContext.UpdateNextTime()
-					scheduleContext.UpdateIterations()
+					wg.Add(1)
 
-					if scheduleContext.IsComplete() {
-						loggingClient.Info("completed schedule, detail : " + scheduleContext.GetInfo())
-					} else {
-						loggingClient.Info("requeue schedule, detail : " + scheduleContext.GetInfo())
-						scheduleQueue.Add(scheduleContext)
-					}
+					//execute it in a individual go routine
+					go execute(scheduleContext, &wg)
 				} else {
 					scheduleQueue.Add(scheduleContext)
 				}
 			}
 		}
 	}
+
+	wg.Wait()
 }
 
-func execute(context *ScheduleContext) {
+func execute(context *ScheduleContext, wg *sync.WaitGroup) {
 	scheduleEventsMap := context.ScheduleEventsMap
+
+	defer wg.Done()
 
 	defer func() {
 		if err := recover(); err != nil {
@@ -414,6 +414,16 @@ func execute(context *ScheduleContext) {
 
 		loggingClient.Debug(fmt.Sprintf("execution returns status code : %d", statusCode))
 		loggingClient.Debug("execution returns response content : " + responseStr)
+	}
+
+	context.UpdateNextTime()
+	context.UpdateIterations()
+
+	if context.IsComplete() {
+		loggingClient.Info("completed schedule, detail : " + context.GetInfo())
+	} else {
+		loggingClient.Info("requeue schedule, detail : " + context.GetInfo())
+		scheduleQueue.Add(context)
 	}
 }
 
