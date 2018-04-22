@@ -11,15 +11,12 @@ import (
 	"fmt"
 	"github.com/edgexfoundry/edgex-go/core/domain/models"
 	"gopkg.in/eapache/queue.v1"
-	"io/ioutil"
-	"net/http"
 	"sync"
 	"time"
 )
 
 const (
-	ScheduleEventInvokeRequestTimeOut = 5000
-	ScheduleInterval                  = 500
+	ScheduleInterval = 500
 )
 
 //the schedule specific shared variables
@@ -398,18 +395,12 @@ func execute(context *ScheduleContext, wg *sync.WaitGroup) {
 		executingUrl := getUrlStr(scheduleEvent.Addressable)
 		loggingClient.Debug("the event with id : " + eventId + " will request url : " + executingUrl)
 
-		req, err := http.NewRequest(http.MethodPost, executingUrl, nil)
-		req.Header.Set(ContentTypeKey, ContentTypeJsonValue)
-		req.Header.Set(ContentLengthKey, string(len(scheduleEvent.Parameters)))
+		responseBytes, statusCode, err := getHttpClient().Post(executingUrl, ContentTypeJsonValue, len(scheduleEvent.Parameters), "5s")
 
 		if err != nil {
-			loggingClient.Error("create new request occurs error : " + err.Error())
+			loggingClient.Error("execution http request error : " + err.Error())
 		}
 
-		client := &http.Client{
-			Timeout: ScheduleEventInvokeRequestTimeOut,
-		}
-		responseBytes, statusCode, err := sendRequestAndGetResponse(client, req)
 		responseStr := string(responseBytes)
 
 		loggingClient.Debug(fmt.Sprintf("execution returns status code : %d", statusCode))
@@ -429,24 +420,6 @@ func execute(context *ScheduleContext, wg *sync.WaitGroup) {
 
 func getUrlStr(addressable models.Addressable) string {
 	return addressable.GetBaseURL() + addressable.Path
-}
-
-func sendRequestAndGetResponse(client *http.Client, req *http.Request) ([]byte, int, error) {
-	resp, err := client.Do(req)
-
-	if err != nil {
-		return []byte{}, 500, err
-	}
-
-	defer resp.Body.Close()
-	resp.Close = true
-
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return []byte{}, 500, err
-	}
-
-	return bodyBytes, resp.StatusCode, nil
 }
 
 //endregion

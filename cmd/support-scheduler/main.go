@@ -27,7 +27,7 @@ var loggingClient logger.LoggingClient
 func main() {
 	start := time.Now()
 	var (
-		useConsul = flag.String("consul", "", "Should the service use consul?")
+		useConsul  = flag.String("consul", "", "Should the service use consul?")
 		useProfile = flag.String("profile", "default", "Specify a profile other than default.")
 	)
 	flag.Parse()
@@ -63,10 +63,12 @@ func main() {
 	var schedulerClient = sc.SchedulerClient{
 		SchedulerServiceHost: configuration.ServiceHost,
 		SchedulerServicePort: 48081,
-		OwningService: scheduler.SupportSchedulerServiceName,
+		OwningService:        scheduler.SupportSchedulerServiceName,
 	}
 
-	scheduler.Init(*configuration, loggingClient, schedulerClient)
+	var httpClient = scheduler.NewDefaultHttpClient()
+
+	scheduler.Init(*configuration, loggingClient, schedulerClient, httpClient)
 
 	r := scheduler.LoadRestRoutes()
 	http.TimeoutHandler(nil, time.Millisecond*time.Duration(configuration.ServerTimeout), "Request timed out")

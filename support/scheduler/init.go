@@ -23,6 +23,7 @@ const (
 var (
 	loggingClient   logger.LoggingClient
 	schedulerClient scheduler.SchedulerClient
+	httpClient      HttpClient
 	ticker          = time.NewTicker(ScheduleInterval * time.Millisecond)
 )
 
@@ -49,9 +50,10 @@ func ConnectToConsul(conf ConfigurationStruct) error {
 	return nil
 }
 
-func Init(conf ConfigurationStruct, l logger.LoggingClient, sc scheduler.SchedulerClient) {
+func Init(conf ConfigurationStruct, l logger.LoggingClient, sc scheduler.SchedulerClient, hc HttpClient) {
 	loggingClient = l
 	schedulerClient = sc
+	httpClient = hc
 	configuration = conf
 	ticker = time.NewTicker(time.Duration(conf.ScheduleInterval) * time.Millisecond)
 }
