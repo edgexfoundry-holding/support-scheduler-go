@@ -60,10 +60,8 @@ func mockInit(host string, port int) {
 	var loggingClient = logger.NewClient(configuration.ApplicationName, configuration.EnableRemoteLogging, "")
 	Init(ConfigurationStruct{
 		ScheduleInterval: 500,
-	}, loggingClient, scheduler.SchedulerClient{
-		SchedulerServiceHost: host,
-		SchedulerServicePort: port,
-	})
+	}, loggingClient,
+		scheduler.NewSchedulerRestClient(host, port, "scheduler"))
 	StartTicker()
 }
 

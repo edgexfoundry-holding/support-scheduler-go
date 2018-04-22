@@ -106,7 +106,7 @@ func TestAddSchedule(t *testing.T) {
 		t.Error(e)
 	}
 
-	scheduleClient := SchedulerClient{
+	scheduleClient := SchedulerRestClient{
 		SchedulerServiceHost: h[0],
 		SchedulerServicePort: intPort,
 		OwningService:        "notifications",
@@ -180,7 +180,7 @@ func TestQuerySchedule(t *testing.T) {
 		t.Error(e)
 	}
 
-	scheduleClient := SchedulerClient{
+	scheduleClient := SchedulerRestClient{
 		SchedulerServiceHost: h[0],
 		SchedulerServicePort: intPort,
 		OwningService:        "notifications",
@@ -269,7 +269,7 @@ func TestQueryScheduleWithName(t *testing.T) {
 		t.Error(e)
 	}
 
-	scheduleClient := SchedulerClient{
+	scheduleClient := SchedulerRestClient{
 		SchedulerServiceHost: h[0],
 		SchedulerServicePort: intPort,
 		OwningService:        "notifications",
@@ -363,7 +363,7 @@ func TestUpdateSchedule(t *testing.T) {
 		t.Error(e)
 	}
 
-	scheduleClient := SchedulerClient{
+	scheduleClient := SchedulerRestClient{
 		SchedulerServiceHost: h[0],
 		SchedulerServicePort: intPort,
 		OwningService:        "notifications",
@@ -416,7 +416,7 @@ func TestRemoveSchedule(t *testing.T) {
 		t.Error(e)
 	}
 
-	scheduleClient := SchedulerClient{
+	scheduleClient := SchedulerRestClient{
 		SchedulerServiceHost: h[0],
 		SchedulerServicePort: intPort,
 		OwningService:        "notifications",
@@ -486,7 +486,7 @@ func TestAddScheduleEvent(t *testing.T) {
 		t.Error(e)
 	}
 
-	scheduleClient := SchedulerClient{
+	scheduleClient := SchedulerRestClient{
 		SchedulerServiceHost: h[0],
 		SchedulerServicePort: intPort,
 		OwningService:        "notifications",
@@ -561,7 +561,7 @@ func TestQueryScheduleEvent(t *testing.T) {
 		t.Error(e)
 	}
 
-	scheduleClient := SchedulerClient{
+	scheduleClient := SchedulerRestClient{
 		SchedulerServiceHost: h[0],
 		SchedulerServicePort: intPort,
 		OwningService:        "notifications",
@@ -656,7 +656,7 @@ func TestUpdateScheduleEvent(t *testing.T) {
 		t.Error(e)
 	}
 
-	scheduleClient := SchedulerClient{
+	scheduleClient := SchedulerRestClient{
 		SchedulerServiceHost: h[0],
 		SchedulerServicePort: intPort,
 		OwningService:        "notifications",
@@ -711,7 +711,7 @@ func TestRemoveScheduleEvent(t *testing.T) {
 		t.Error(e)
 	}
 
-	scheduleClient := SchedulerClient{
+	scheduleClient := SchedulerRestClient{
 		SchedulerServiceHost: h[0],
 		SchedulerServicePort: intPort,
 		OwningService:        "notifications",

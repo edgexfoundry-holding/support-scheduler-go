@@ -27,7 +27,7 @@ var loggingClient logger.LoggingClient
 func main() {
 	start := time.Now()
 	var (
-		useConsul = flag.String("consul", "", "Should the service use consul?")
+		useConsul  = flag.String("consul", "", "Should the service use consul?")
 		useProfile = flag.String("profile", "default", "Specify a profile other than default.")
 	)
 	flag.Parse()
@@ -60,11 +60,7 @@ func main() {
 	loggingClient.Info(consulMsg)
 	loggingClient.Info(fmt.Sprintf("starting %s %s ", scheduler.SupportSchedulerServiceName, edgex.Version))
 
-	var schedulerClient = sc.SchedulerClient{
-		SchedulerServiceHost: configuration.ServiceHost,
-		SchedulerServicePort: 48081,
-		OwningService: scheduler.SupportSchedulerServiceName,
-	}
+	var schedulerClient = sc.NewSchedulerRestClient(configuration.ServiceHost, 48081, scheduler.SupportSchedulerServiceName)
 
 	scheduler.Init(*configuration, loggingClient, schedulerClient)
 
